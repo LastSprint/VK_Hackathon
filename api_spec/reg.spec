@@ -1,6 +1,6 @@
 // -- Requests
 
-POST /reg/form
+POST http://demo6.alpha.vkhackathon.com:8844/reg/form
 Request -> 
     object: RegistrForm
 <- Response
