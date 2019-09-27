@@ -6,6 +6,12 @@ Request ->
 <- Response
     empty
 
+POST http://demo6.alpha.vkhackathon.com:8844/reg/status
+Request -> 
+    object: RegistrForm
+<- Response
+    empty
+
 // -- Models
 
 struct RegistrForm {
@@ -163,4 +169,21 @@ enum MentorType {
     case mentor = 0
     case volunteer = 1
     case partner = 2
+}
+
+struct CheckStatusRequest {
+    // email пользователя
+    value: String
+}
+
+struct CheckStatusResponse {
+    // Статус формы пользователя
+    status: FormStatus
+}
+
+enum FormStatus {
+    case new = 0
+    case viewed = 1
+    case called = 2
+    case approved = 3
 }

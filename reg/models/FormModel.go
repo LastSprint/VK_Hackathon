@@ -5,7 +5,8 @@ type FormStatusModel int
 const (
 	New      FormStatusModel = 0
 	Viewed   FormStatusModel = 1
-	Approves FormStatusModel = 2
+	Called   FormStatusModel = 2
+	Approves FormStatusModel = 3
 )
 
 type FormModel struct {
@@ -18,6 +19,7 @@ type FormModel struct {
 	EducationInfo         *EducationInfoModel     `json:"educationInfo"`
 	HealthInfo            *HealthInfoModel        `json:"healthInfo"`
 	FormStatus            *FormStatusModel        `json:"formStatus,omitempty"`
+	UserInfo              *UserInfoModel          `json:"userInfo"`
 }
 
 func (model *FormModel) IsValid() bool {
@@ -26,5 +28,6 @@ func (model *FormModel) IsValid() bool {
 		model.FamilyInfo != nil &&
 		model.JobInfo != nil &&
 		model.HealthInfo != nil &&
-		model.Hobby != nil
+		model.Hobby != nil &&
+		model.UserInfo != nil
 }

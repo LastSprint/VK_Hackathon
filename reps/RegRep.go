@@ -2,6 +2,8 @@ package reps
 
 import (
 	reg "suncity/reg/models"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 const dbName = "users"
@@ -30,4 +32,35 @@ func (rep *RegRep) PostForm(form reg.FormModel) error {
 	_, err = collection.InsertOne(rep.cntx.cntx, form)
 
 	return err
+}
+
+func (rep *RegRep) CheckFormStatus(value string) (*reg.CheckStatusResponseModel, error) {
+
+	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	collection := rep.cntx.db.Collection(dbName)
+
+	filter := bson.M{
+		"userInfo.email": value,
+	}
+
+	res := collection.FindOne(rep.cntx.cntx, filter)
+
+	if res.Err() != nil {
+		return nil, res.Err()
+	}
+
+	var result reg.CheckStatusResponseModel
+
+	err = res.Decode(&result)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, err
 }
