@@ -71,7 +71,7 @@ struct RegistrForm {
         // Имя партнера
         partnerName: String?
         // ПОл партнера
-        partnerMale: Male?
+        partnerSex: Sex?
         // Возраст партнера
         partnerOld: Int?
         // Кем приходится
@@ -99,7 +99,7 @@ struct RegistrForm {
         whyYouWantToHelp: String
         childType: struct {
             old: Int
-            male: Male?
+            sex: Sex?
             requirements: String
             visitsFrequency: String
             ifChildIsBroken: Bool
@@ -154,7 +154,7 @@ enum FamilyStatus {
     case notMarried = 4
 }
 
-enum Male {
+enum Sex {
     case male = 0
     case female = 1
 }
