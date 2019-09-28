@@ -50,7 +50,7 @@ func (h *Hub) Run() {
 				close(client.send)
 			}
 		case message := <-h.broadcast:
-			var msg reps.MessageModel
+			var msg commod.MessageModel
 
 			json.Unmarshal(message, &msg)
 

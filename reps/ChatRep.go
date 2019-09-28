@@ -2,19 +2,10 @@ package reps
 
 import (
 	"suncity/commod"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-type MessageModel struct {
-	Recipient string `json:"recipient"`
-	Text      string
-	Sender    *commod.ServiceUser `json:"sender"`
-	Time      time.Time           `json:"time"`
-	IsMe      bool
-}
 
 type ChatRep struct {
 	cntx *DBContext
@@ -24,7 +15,7 @@ func InitChatRep(cntx *DBContext) *ChatRep {
 	return &ChatRep{cntx: cntx}
 }
 
-func (rep *ChatRep) SaveMessage(msg *MessageModel, user *commod.ServiceUser) error {
+func (rep *ChatRep) SaveMessage(msg *commod.MessageModel, user *commod.ServiceUser) error {
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
 
 	collection := rep.cntx.db.Collection(dbName)
@@ -52,7 +43,7 @@ func (rep *ChatRep) SaveMessage(msg *MessageModel, user *commod.ServiceUser) err
 	return nil
 }
 
-func (rep *ChatRep) SaveMessageById(msg *MessageModel, userId string) error {
+func (rep *ChatRep) SaveMessageById(msg *commod.MessageModel, userId string) error {
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
 
 	collection := rep.cntx.db.Collection(dbName)

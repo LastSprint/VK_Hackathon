@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"suncity/auth"
 	"suncity/commod"
-	"suncity/reps"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -73,7 +72,7 @@ func (c *Client) readPump() {
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
 
-		var jm reps.MessageModel
+		var jm commod.MessageModel
 
 		json.Unmarshal(message, &jm)
 
@@ -84,7 +83,7 @@ func (c *Client) readPump() {
 
 		jm.IsMe = true
 
-		c.hub.rep.SaveMessage(&jm, c.user)
+		go c.hub.rep.SaveMessage(&jm, c.user)
 
 		log.Println("CLIENT WRITE MESSAGE")
 		c.hub.broadcast <- message
@@ -113,7 +112,7 @@ func (c *Client) writePump() {
 				return
 			}
 
-			var masg reps.MessageModel
+			var masg commod.MessageModel
 
 			json.Unmarshal(message, &masg)
 

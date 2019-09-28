@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"suncity/commod"
 	"suncity/reps"
 
 	"github.com/dgrijalva/jwt-go"
@@ -23,6 +24,7 @@ type AuthController struct {
 func InitAuthService(rep *reps.AuthRep, router *mux.Router) *AuthController {
 	res := &AuthController{rep: rep}
 	router.HandleFunc("/auth", res.Auth).Methods("POST")
+	router.HandleFunc("/chat", AuthHandler(res.GetMessages)).Methods("GET")
 	return res
 }
 
@@ -70,4 +72,14 @@ func (contr *AuthController) Auth(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"token": tokenString,
 	})
+}
+
+func (contr *AuthController) GetMessages(w http.ResponseWriter, r *http.Request, user *commod.ServiceUser) {
+
+	res := map[string]interface{}{
+		"partnerId": user.Parner.Hex(),
+		"messages":  user.Messages,
+	}
+
+	json.NewEncoder(w).Encode(res)
 }
