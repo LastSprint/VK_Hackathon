@@ -49,7 +49,7 @@ func main() {
 	hub := chat.NewHub(reps.InitChatRep(cntx))
 	go hub.Run()
 
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+	router.PathPrefix("/ws").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		chat.ServeWs(hub, w, r)
 	})
 
