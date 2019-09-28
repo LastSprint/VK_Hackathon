@@ -7,10 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const connectionString = "mongodb://mongoadmin:secret@demo6.alpha.vkhackathon.com:27017/sun_city"
+const connectionString = "mongodb://mongoadmin:secret@demo6.alpha.vkhackathon.com:27017/admin"
 const dataBaseString = "sun_city"
 
-const testConnectionString = "mongodb://mongoadmin:secret@demo6.alpha.vkhackathon.com:27017/sun_city"
+const testConnectionString = "mongodb://mongoadmin:secret@demo6.alpha.vkhackathon.com:27017/admin"
 const testDataBaseString = "test_sun_city"
 
 // DBContext контекст для работы с БД.

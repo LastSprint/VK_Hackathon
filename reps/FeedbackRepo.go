@@ -1,11 +1,28 @@
 package reps
 
 import (
-	"suncity/feedback"
-
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+type MessageModel struct {
+	Author string `json:"author"`
+	Text   string `json:"text"`
+}
+
+type CreateFeedbackModel struct {
+	Filepath *string `json:"аilepath"`
+	Text     string  `json:"text"`
+}
+
+type FeedbackDockModel struct {
+	ID string `json:"id"`
+
+	Filepath *string `json:"аilepath"`
+	Text     string  `json:"text"`
+
+	Messages *[]MessageModel `json:"text"`
+}
 
 type NotFound struct {
 }
@@ -26,7 +43,7 @@ func InitFeedbackRep(cntx *DBContext) *RegRep {
 	return &RegRep{cntx: cntx}
 }
 
-func (rep *FeedbackRepo) AddComment(msg *feedback.MessageModel, id string) error {
+func (rep *FeedbackRepo) AddComment(msg *MessageModel, id string) error {
 
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
 
@@ -60,7 +77,7 @@ func (rep *FeedbackRepo) AddComment(msg *feedback.MessageModel, id string) error
 	return nil
 }
 
-func (rep *FeedbackRepo) CreatePost(post *feedback.CreateFeedbackModel) error {
+func (rep *FeedbackRepo) CreatePost(post *CreateFeedbackModel) error {
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
 
 	collection := rep.cntx.db.Collection(feedbackDBName)
@@ -74,7 +91,7 @@ func (rep *FeedbackRepo) CreatePost(post *feedback.CreateFeedbackModel) error {
 	return nil
 }
 
-func (rep *FeedbackRepo) GetAllPosts() (*[]feedback.FeedbackDockModel, error) {
+func (rep *FeedbackRepo) GetAllPosts() (*[]FeedbackDockModel, error) {
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
 
 	collection := rep.cntx.db.Collection(feedbackDBName)
@@ -85,7 +102,7 @@ func (rep *FeedbackRepo) GetAllPosts() (*[]feedback.FeedbackDockModel, error) {
 		return nil, err
 	}
 
-	var docks *[]feedback.FeedbackDockModel
+	var docks *[]FeedbackDockModel
 
 	err = res.All(rep.cntx.cntx, docks)
 

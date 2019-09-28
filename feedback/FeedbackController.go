@@ -13,25 +13,6 @@ import (
 	"github.com/segmentio/ksuid"
 )
 
-type MessageModel struct {
-	Author string `json:"author"`
-	Text   string `json:"text"`
-}
-
-type CreateFeedbackModel struct {
-	Filepath *string `json:"аilepath"`
-	Text     string  `json:"text"`
-}
-
-type FeedbackDockModel struct {
-	ID string `json:"id"`
-
-	Filepath *string `json:"аilepath"`
-	Text     string  `json:"text"`
-
-	Messages *[]MessageModel `json:"text"`
-}
-
 type FeedbackController struct {
 	rep *reps.FeedbackRepo
 }
@@ -48,7 +29,7 @@ func InitFeedbackController(router *mux.Router, rep *reps.FeedbackRepo) *Feedbac
 
 func (contrl *FeedbackController) commentFeedback(w http.ResponseWriter, r *http.Request) {
 
-	var comment MessageModel
+	var comment reps.MessageModel
 
 	err := json.NewDecoder(r.Body).Decode(&comment)
 
@@ -102,7 +83,7 @@ func (contrl *FeedbackController) createNewPos(w http.ResponseWriter, r *http.Re
 		f.Close()
 	}
 
-	post := CreateFeedbackModel{Filepath: &filepath, Text: r.FormValue("text")}
+	post := reps.CreateFeedbackModel{Filepath: &filepath, Text: r.FormValue("text")}
 
 	err = contrl.rep.CreatePost(&post)
 
