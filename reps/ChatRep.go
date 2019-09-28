@@ -9,8 +9,8 @@ import (
 )
 
 type MessageModel struct {
-	Recipient string              `json:"recipient"`
-	Text      string              `json:"text"`
+	Recipient string `json:"recipient"`
+	Text      string
 	Sender    *commod.ServiceUser `json:"sender"`
 	Time      time.Time           `json:"time"`
 	IsMe      bool
