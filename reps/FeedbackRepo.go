@@ -29,7 +29,7 @@ type FeedbackDockModel struct {
 	Audio    string
 	Text     string
 	Images   []string
-	Comments *[]MessageModel
+	Comments *[]FeedbackMessageModel
 }
 
 type NotFound struct {
