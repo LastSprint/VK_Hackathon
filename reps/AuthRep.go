@@ -64,7 +64,7 @@ func (rep *AuthRep) GetUser(log, pass string) (*commod.ServiceUser, error) {
 	return &user, nil
 }
 
-func (rep *AuthRep) RegToken(token string, id primitive.ObjectID) error {
+func (rep *AuthRep) RegToken(token string, apns string, id primitive.ObjectID) error {
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
 
 	if err != nil {
@@ -76,6 +76,7 @@ func (rep *AuthRep) RegToken(token string, id primitive.ObjectID) error {
 	res, err := collection.UpdateOne(rep.cntx.cntx, bson.M{"_id": id}, bson.M{
 		"$set": bson.M{
 			"token": token,
+			"apns":  apns,
 		},
 	})
 

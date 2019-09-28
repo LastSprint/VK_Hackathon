@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"os"
 	"suncity/auth"
+	"suncity/commod"
 	"suncity/feedback"
+	"suncity/notifications"
 	"suncity/reg"
 	"suncity/reps"
 
@@ -44,6 +46,10 @@ func main() {
 	router.PathPrefix("/static/").Handler(
 		http.StripPrefix("/static/", http.FileServer(http.Dir("/static/"))),
 	)
+
+	router.HandleFunc("/push", func(w http.ResponseWriter, r *http.Request) {
+		notifications.SendNotification(nil, &commod.ServiceUser{Apns: "f217d876f98f78330ff3da4ac72adaf542defd5f4ab01ace1eeded41cb1a5a6b"})
+	}).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8844", handlers.LoggingHandler(os.Stdout, router)))
 }

@@ -15,4 +15,5 @@ type ServiceUser struct {
 	Name        string
 	Image       string
 	Description string
+	Apns        string
 }

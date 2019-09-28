@@ -13,6 +13,7 @@ import (
 type AuthModel struct {
 	Email string `json:"email"`
 	Pass  string `json:"password"`
+	Apns  string `json:"apns"`
 }
 
 type AuthController struct {
@@ -58,7 +59,7 @@ func (contr *AuthController) Auth(w http.ResponseWriter, r *http.Request) {
 
 	tokenString, err := token.SignedString([]byte("mySigningKey"))
 
-	err = contr.rep.RegToken(tokenString, res.ID)
+	err = contr.rep.RegToken(tokenString, user.Apns, res.ID)
 
 	if err != nil {
 		w.WriteHeader(500)
