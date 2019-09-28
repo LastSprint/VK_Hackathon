@@ -41,5 +41,9 @@ func main() {
 
 	// chat.StartChat(router)
 
+	router.PathPrefix("/static/").Handler(
+		http.StripPrefix("/static/", http.FileServer(http.Dir("/static/"))),
+	)
+
 	log.Fatal(http.ListenAndServe(":8844", handlers.LoggingHandler(os.Stdout, router)))
 }
