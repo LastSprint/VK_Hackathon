@@ -1,15 +1,18 @@
 package notifications
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"suncity/auth"
 	"suncity/commod"
 
 	"github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
+	"github.com/sirupsen/logrus"
 )
 
-func SendNotification(fromUser *commod.ServiceUser, toUser *commod.ServiceUser) {
+func SendNotification(fromUser *commod.ServiceUser, toUser *commod.ServiceUser, payload string) {
 
 	fmt.Println("SEND START")
 
@@ -24,14 +27,18 @@ func SendNotification(fromUser *commod.ServiceUser, toUser *commod.ServiceUser) 
 	notification.DeviceToken = toUser.Apns
 	notification.Topic = "surf.vk.hackathon.sun.city"
 
-	str := `{
-		"aps": {
-		  "alert": "Breaking News! Антон пиздабол",
-		  "sound": "default",
-		  "link_url": "https://raywenderlich.com"
-		}
-	  }`
-	notification.Payload = []byte(str) // See Payload section below
+	jsr := map[string]interface{}{
+		"aps": map[string]interface{}{
+			"alert": map[string]string{
+				"title": fromUser.Name,
+				"body":  payload,
+			},
+		},
+	}
+
+	data, _ := json.Marshal(jsr)
+
+	notification.Payload = []byte(data) // See Payload section below
 
 	fmt.Println("NOTIF START")
 
@@ -48,4 +55,14 @@ func SendNotification(fromUser *commod.ServiceUser, toUser *commod.ServiceUser) 
 	}
 
 	fmt.Printf("%v %v %v\n", res.StatusCode, res.ApnsID, res.Reason)
+}
+
+func SendNotificationByUserId(sender *commod.ServiceUser, recivier string, data string) {
+	usr, err := auth.AuthRepo.GetUserById(recivier)
+
+	if err != nil {
+		logrus.Errorln(err)
+	}
+
+	SendNotification(sender, usr, data)
 }

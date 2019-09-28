@@ -33,7 +33,7 @@ func InitFeedbackController(rep *reps.FeedbackRepo, router *mux.Router) *Feedbac
 
 func (contrl *FeedbackController) commentFeedback(w http.ResponseWriter, r *http.Request, user *commod.ServiceUser) {
 
-	var comment reps.MessageModel
+	var comment reps.FeedbackMessageModel
 
 	err := json.NewDecoder(r.Body).Decode(&comment)
 

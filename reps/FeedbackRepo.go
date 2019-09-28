@@ -1,14 +1,13 @@
 package reps
 
 import (
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type MessageModel struct {
+type FeedbackMessageModel struct {
 	UserID primitive.ObjectID
 	Image  string
 	Name   string
@@ -52,7 +51,7 @@ func InitFeedbackRep(cntx *DBContext) *FeedbackRepo {
 	return &FeedbackRepo{cntx: cntx}
 }
 
-func (rep *FeedbackRepo) AddComment(msg *MessageModel, id string) error {
+func (rep *FeedbackRepo) AddComment(msg *FeedbackMessageModel, id string) error {
 
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
 
@@ -101,7 +100,7 @@ func (rep *FeedbackRepo) AddComment(msg *MessageModel, id string) error {
 
 func (rep *FeedbackRepo) CreatePost(post *CreateFeedbackModel) error {
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
-	fmt.Println("HSGHJDFGHJASDGFHJ")
+
 	if err != nil {
 		return err
 	}

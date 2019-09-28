@@ -115,3 +115,29 @@ func (rep *AuthRep) GetUserByToken(token string) (*commod.ServiceUser, error) {
 
 	return &user, nil
 }
+
+func (rep *AuthRep) GetUserById(id string) (*commod.ServiceUser, error) {
+	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	collection := rep.cntx.db.Collection(userDb)
+	objid, _ := primitive.ObjectIDFromHex(id)
+	res := collection.FindOne(rep.cntx.cntx, bson.M{
+		"_id": objid,
+	})
+
+	err = res.Err()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var user commod.ServiceUser
+
+	res.Decode(&user)
+
+	return &user, nil
+}

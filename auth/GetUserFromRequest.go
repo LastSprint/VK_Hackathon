@@ -8,10 +8,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var authRepo *reps.AuthRep
+var AuthRepo *reps.AuthRep
 
 func Init(rep *reps.AuthRep) {
-	authRepo = rep
+	AuthRepo = rep
 }
 
 func GetUserFromRequest(r *http.Request) (*commod.ServiceUser, error) {
@@ -22,7 +22,7 @@ func GetUserFromRequest(r *http.Request) (*commod.ServiceUser, error) {
 
 	token := r.Header["Authorization"][0]
 
-	return authRepo.GetUserByToken(token)
+	return AuthRepo.GetUserByToken(token)
 }
 
 func AuthHandler(next func(w http.ResponseWriter, r *http.Request, user *commod.ServiceUser)) func(w http.ResponseWriter, r *http.Request) {

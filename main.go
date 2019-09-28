@@ -5,9 +5,8 @@ import (
 	"net/http"
 	"os"
 	"suncity/auth"
-	"suncity/commod"
+	"suncity/chat"
 	"suncity/feedback"
-	"suncity/notifications"
 	"suncity/reg"
 	"suncity/reps"
 
@@ -47,9 +46,29 @@ func main() {
 		http.StripPrefix("/static/", http.FileServer(http.Dir("/static/"))),
 	)
 
-	router.HandleFunc("/push", func(w http.ResponseWriter, r *http.Request) {
-		notifications.SendNotification(nil, &commod.ServiceUser{Apns: "f217d876f98f78330ff3da4ac72adaf542defd5f4ab01ace1eeded41cb1a5a6b"})
-	}).Methods("POST")
+	hub := chat.NewHub(reps.InitChatRep(cntx))
+	go hub.Run()
+
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		chat.ServeWs(hub, w, r)
+	})
+
+	// router.HandleFunc("/push", func(w http.ResponseWriter, r *http.Request) {
+	// 	notifications.SendNotification(nil, &commod.ServiceUser{Apns: "f217d876f98f78330ff3da4ac72adaf542defd5f4ab01ace1eeded41cb1a5a6b"})
+	// }).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8844", handlers.LoggingHandler(os.Stdout, router)))
+}
+
+func serveHome(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL)
+	if r.URL.Path != "/" {
+		http.Error(w, "Not found", http.StatusNotFound)
+		return
+	}
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	http.ServeFile(w, r, "home.html")
 }
