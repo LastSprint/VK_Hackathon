@@ -2,6 +2,7 @@ package reps
 
 import (
 	"fmt"
+	"suncity/commod"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,23 +14,11 @@ type AuthRep struct {
 
 var userDb = "users"
 
-type UserTypeModel int
-
-const (
-	Mentor UserTypeModel = 0
-	Psy    UserTypeModel = 1
-)
-
-type ServiceUser struct {
-	ID       primitive.ObjectID `bson:"_id"`
-	UserType UserTypeModel
-}
-
 func InitAuthRep(cntx *DBContext) *AuthRep {
 	return &AuthRep{cntx: cntx}
 }
 
-func (rep *AuthRep) GetUser(log, pass string) (*ServiceUser, error) {
+func (rep *AuthRep) GetUser(log, pass string) (*commod.ServiceUser, error) {
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
 	fmt.Println("PING")
 	fmt.Println(err)
@@ -62,7 +51,7 @@ func (rep *AuthRep) GetUser(log, pass string) (*ServiceUser, error) {
 
 	fmt.Println("DECODE")
 
-	var user ServiceUser
+	var user commod.ServiceUser
 
 	fmt.Println(res)
 
@@ -98,4 +87,30 @@ func (rep *AuthRep) RegToken(token string, id primitive.ObjectID) error {
 	}
 
 	return nil
+}
+
+func (rep *AuthRep) GetUserByToken(token string) (*commod.ServiceUser, error) {
+	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	collection := rep.cntx.db.Collection(userDb)
+
+	res := collection.FindOne(rep.cntx.cntx, bson.M{
+		"token": token,
+	})
+
+	err = res.Err()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var user commod.ServiceUser
+
+	res.Decode(&user)
+
+	return &user, nil
 }

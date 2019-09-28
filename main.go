@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"suncity/auth"
+	"suncity/feedback"
 	"suncity/reg"
 	"suncity/reps"
 
@@ -19,6 +20,7 @@ type AuthModel struct {
 
 var regController *reg.Controller
 var authController *auth.AuthController
+var feedbackController *feedback.FeedbackController
 
 var cntx *reps.DBContext
 
@@ -33,6 +35,11 @@ func main() {
 	router := mux.NewRouter()
 	regController = reg.InitRegController(reps.InitRegRep(cnt), router)
 	authController = auth.InitAuthService(reps.InitAuthRep(cnt), router)
+	feedbackController = feedback.InitFeedbackController(reps.InitFeedbackRep(cntx), router)
+
+	auth.Init(reps.InitAuthRep(cnt))
+
+	// chat.StartChat(router)
 
 	log.Fatal(http.ListenAndServe(":8844", handlers.LoggingHandler(os.Stdout, router)))
 }

@@ -1,6 +1,8 @@
 package reps
 
 import (
+	"fmt"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -11,8 +13,10 @@ type MessageModel struct {
 }
 
 type CreateFeedbackModel struct {
-	Filepath *string `json:"аilepath"`
-	Text     string  `json:"text"`
+	UserId primitive.ObjectID
+	Text   string   `json:"text"`
+	Audio  string   `json:"audio"`
+	Images []string `json:"images"`
 }
 
 type FeedbackDockModel struct {
@@ -39,8 +43,8 @@ type FeedbackRepo struct {
 }
 
 // InitFeedbackRep иницаллизирует репозиторий
-func InitFeedbackRep(cntx *DBContext) *RegRep {
-	return &RegRep{cntx: cntx}
+func InitFeedbackRep(cntx *DBContext) *FeedbackRepo {
+	return &FeedbackRepo{cntx: cntx}
 }
 
 func (rep *FeedbackRepo) AddComment(msg *MessageModel, id string) error {
@@ -79,6 +83,10 @@ func (rep *FeedbackRepo) AddComment(msg *MessageModel, id string) error {
 
 func (rep *FeedbackRepo) CreatePost(post *CreateFeedbackModel) error {
 	err := rep.cntx.client.Ping(rep.cntx.cntx, nil)
+	fmt.Println("HSGHJDFGHJASDGFHJ")
+	if err != nil {
+		return err
+	}
 
 	collection := rep.cntx.db.Collection(feedbackDBName)
 

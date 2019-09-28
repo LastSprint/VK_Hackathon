@@ -7,6 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"suncity/auth"
+	"suncity/commod"
 	"suncity/reps"
 
 	"github.com/gorilla/mux"
@@ -17,11 +20,11 @@ type FeedbackController struct {
 	rep *reps.FeedbackRepo
 }
 
-func InitFeedbackController(router *mux.Router, rep *reps.FeedbackRepo) *FeedbackController {
-	controller := &FeedbackController{}
+func InitFeedbackController(rep *reps.FeedbackRepo, router *mux.Router) *FeedbackController {
+	controller := &FeedbackController{rep: rep}
 
 	router.HandleFunc("/feedback/comment/{id}", controller.commentFeedback).Methods("POST")
-	router.HandleFunc("/feedback/comment", controller.createNewPos).Methods("POST")
+	router.HandleFunc("/feedback/comment", auth.AuthHandler(controller.createNewPos)).Methods("POST")
 	router.HandleFunc("/feedback/comment", controller.getAllPosts).Methods("GET")
 
 	return controller
@@ -54,37 +57,32 @@ func (contrl *FeedbackController) commentFeedback(w http.ResponseWriter, r *http
 	return
 }
 
-func (contrl *FeedbackController) createNewPos(w http.ResponseWriter, r *http.Request) {
-	r.ParseMultipartForm(32 << 20)
-	file, handler, err := r.FormFile("audio")
-	if err != nil {
-		log.Println(err)
-		return
-	}
+func (contrl *FeedbackController) createNewPos(w http.ResponseWriter, r *http.Request, user *commod.ServiceUser) {
+	r.ParseMultipartForm(100 << 29)
 
 	ad, err := ksuid.NewRandom()
 
+	audioPath := "/static/audio/" + ad.String() + ".m4a"
+
+	err = saveAudio(r, audioPath)
+
 	if err != nil {
-		w.WriteHeader(500)
-		return
-	}
-
-	filepath := "/static/audio/" + ad.String()
-
-	defer file.Close()
-	fmt.Fprintf(w, "%v", handler.Header)
-
-	f, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0666)
-	if err != nil {
+		audioPath = ""
 		log.Println(err)
-		filepath = ""
-	} else {
-		io.Copy(f, file)
-		f.Close()
 	}
 
-	post := reps.CreateFeedbackModel{Filepath: &filepath, Text: r.FormValue("text")}
+	images, err := savePhotos(r, "/static/photos/")
 
+	fmt.Println()
+
+	post := reps.CreateFeedbackModel{
+		UserId: user.ID,
+		Audio:  audioPath,
+		Images: images,
+		Text:   r.FormValue("text"),
+	}
+
+	fmt.Println(contrl)
 	err = contrl.rep.CreatePost(&post)
 
 	if err != nil {
@@ -114,4 +112,58 @@ func (contrl *FeedbackController) getAllPosts(w http.ResponseWriter, r *http.Req
 	}
 
 	return
+}
+
+func saveAudio(r *http.Request, filepath string) error {
+
+	file, _, err := r.FormFile("audio")
+
+	if err != nil {
+		return err
+	}
+
+	f, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	io.Copy(f, file)
+	f.Close()
+	file.Close()
+	return nil
+}
+
+func savePhotos(r *http.Request, dirpath string) ([]string, error) {
+
+	prefix := "photo"
+
+	result := []string{}
+
+	for i := 0; ; i++ {
+
+		name := prefix + strconv.Itoa(i)
+
+		file, _, err := r.FormFile(name)
+
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+
+		resultName := dirpath + name + ".jpg"
+
+		f, err := os.OpenFile(resultName, os.O_WRONLY|os.O_CREATE, 0666)
+
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
+
+		result = append(result, resultName)
+
+		io.Copy(f, file)
+		f.Close()
+		file.Close()
+	}
+
+	return result, nil
 }
