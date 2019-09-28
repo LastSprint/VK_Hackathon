@@ -25,11 +25,11 @@ type CreateFeedbackModel struct {
 }
 
 type FeedbackDockModel struct {
-	ID     primitive.ObjectID
-	UserID primitive.ObjectID
-	Audio  string
-	Text   string
-
+	ID       primitive.ObjectID `bson:"_id"`
+	UserID   primitive.ObjectID
+	Audio    string
+	Text     string
+	Images   []string
 	Comments *[]MessageModel
 }
 
@@ -128,13 +128,13 @@ func (rep *FeedbackRepo) GetAllPosts() (*[]FeedbackDockModel, error) {
 		return nil, err
 	}
 
-	var docks *[]FeedbackDockModel
+	var docks []FeedbackDockModel
 
-	err = res.All(rep.cntx.cntx, docks)
+	err = res.All(rep.cntx.cntx, &docks)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return docks, nil
+	return &docks, nil
 }

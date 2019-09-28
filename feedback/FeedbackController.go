@@ -26,7 +26,7 @@ func InitFeedbackController(rep *reps.FeedbackRepo, router *mux.Router) *Feedbac
 
 	router.HandleFunc("/feedback/comment/{id}", auth.AuthHandler(controller.commentFeedback)).Methods("POST")
 	router.HandleFunc("/feedback/comment", auth.AuthHandler(controller.createNewPos)).Methods("POST")
-	router.HandleFunc("/feedback/comment", controller.getAllPosts).Methods("GET")
+	router.HandleFunc("/feedback", auth.AuthHandler(controller.getAllPosts)).Methods("GET")
 
 	return controller
 }
@@ -100,7 +100,7 @@ func (contrl *FeedbackController) createNewPos(w http.ResponseWriter, r *http.Re
 	w.WriteHeader(204)
 }
 
-func (contrl *FeedbackController) getAllPosts(w http.ResponseWriter, r *http.Request) {
+func (contrl *FeedbackController) getAllPosts(w http.ResponseWriter, r *http.Request, user *commod.ServiceUser) {
 	data, err := contrl.rep.GetAllPosts()
 
 	if err != nil {
@@ -109,7 +109,12 @@ func (contrl *FeedbackController) getAllPosts(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(data)
+	js := map[string]interface{}{
+		"user":    user,
+		"payload": data,
+	}
+
+	err = json.NewEncoder(w).Encode(js)
 
 	if err != nil {
 		w.WriteHeader(500)
