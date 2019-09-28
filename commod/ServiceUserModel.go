@@ -12,4 +12,6 @@ const (
 type ServiceUser struct {
 	ID       primitive.ObjectID `bson:"_id"`
 	UserType UserTypeModel
+	Name     string
+	Image    string
 }

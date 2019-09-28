@@ -11,6 +11,7 @@ import (
 	"suncity/auth"
 	"suncity/commod"
 	"suncity/reps"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/segmentio/ksuid"
@@ -23,14 +24,14 @@ type FeedbackController struct {
 func InitFeedbackController(rep *reps.FeedbackRepo, router *mux.Router) *FeedbackController {
 	controller := &FeedbackController{rep: rep}
 
-	router.HandleFunc("/feedback/comment/{id}", controller.commentFeedback).Methods("POST")
+	router.HandleFunc("/feedback/comment/{id}", auth.AuthHandler(controller.commentFeedback)).Methods("POST")
 	router.HandleFunc("/feedback/comment", auth.AuthHandler(controller.createNewPos)).Methods("POST")
 	router.HandleFunc("/feedback/comment", controller.getAllPosts).Methods("GET")
 
 	return controller
 }
 
-func (contrl *FeedbackController) commentFeedback(w http.ResponseWriter, r *http.Request) {
+func (contrl *FeedbackController) commentFeedback(w http.ResponseWriter, r *http.Request, user *commod.ServiceUser) {
 
 	var comment reps.MessageModel
 
@@ -43,6 +44,11 @@ func (contrl *FeedbackController) commentFeedback(w http.ResponseWriter, r *http
 	}
 
 	id := mux.Vars(r)["id"]
+
+	comment.Name = user.Name
+	comment.Date = time.Time{}
+	comment.Image = user.Image
+	comment.UserID = user.ID
 
 	err = contrl.rep.AddComment(&comment, id)
 

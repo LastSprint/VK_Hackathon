@@ -2,13 +2,18 @@ package reps
 
 import (
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type MessageModel struct {
-	Author string `json:"author"`
+	UserID primitive.ObjectID
+	Image  string
+	Name   string
+	Date   time.Time
+	IsMe   bool
 	Text   string `json:"text"`
 }
 
@@ -20,12 +25,12 @@ type CreateFeedbackModel struct {
 }
 
 type FeedbackDockModel struct {
-	ID string `json:"id"`
+	ID     primitive.ObjectID
+	UserID primitive.ObjectID
+	Audio  string
+	Text   string
 
-	Filepath *string `json:"аilepath"`
-	Text     string  `json:"text"`
-
-	Messages *[]MessageModel `json:"text"`
+	Comments *[]MessageModel
 }
 
 type NotFound struct {
@@ -61,11 +66,24 @@ func (rep *FeedbackRepo) AddComment(msg *MessageModel, id string) error {
 
 	message := bson.M{
 		"$push": bson.M{
-			"comments": bson.M{
-				"author": msg.Author,
-				"text":   msg.Text,
-			},
+			"comments": msg,
 		},
+	}
+
+	prmid, _ := primitive.ObjectIDFromHex(id)
+
+	t := collection.FindOne(rep.cntx.cntx, bson.M{"_id": prmid})
+
+	if t.Err() != nil {
+		return t.Err()
+	}
+
+	var tml FeedbackDockModel
+
+	t.Decode(&tml)
+
+	if tml.UserID.Hex() == msg.UserID.Hex() {
+		msg.IsMe = true
 	}
 
 	res, err := collection.UpdateOne(rep.cntx.cntx, filer, message)
