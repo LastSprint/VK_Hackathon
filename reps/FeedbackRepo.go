@@ -21,6 +21,7 @@ type CreateFeedbackModel struct {
 	Text   string   `json:"text"`
 	Audio  string   `json:"audio"`
 	Images []string `json:"images"`
+	Date   time.Time
 }
 
 type FeedbackDockModel struct {
@@ -29,6 +30,7 @@ type FeedbackDockModel struct {
 	Audio    string
 	Text     string
 	Images   []string
+	Date     time.Time
 	Comments *[]FeedbackMessageModel
 }
 
@@ -104,6 +106,8 @@ func (rep *FeedbackRepo) CreatePost(post *CreateFeedbackModel) error {
 	if err != nil {
 		return err
 	}
+
+	post.Date = time.Now()
 
 	collection := rep.cntx.db.Collection(feedbackDBName)
 
