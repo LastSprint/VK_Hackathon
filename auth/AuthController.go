@@ -77,7 +77,7 @@ func (contr *AuthController) Auth(w http.ResponseWriter, r *http.Request) {
 func (contr *AuthController) GetMessages(w http.ResponseWriter, r *http.Request, user *commod.ServiceUser) {
 
 	res := map[string]interface{}{
-		"partnerId": user.Parner.Hex(),
+		"partnerId": user.Partner.Hex(),
 		"messages":  user.Messages,
 	}
 
