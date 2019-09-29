@@ -15,8 +15,8 @@ const (
 
 type ServiceUser struct {
 	ID          primitive.ObjectID `bson:"_id"`
-	Parner      primitive.ObjectID
-	UserType    UserTypeModel `bson:"type"`
+	Partner     primitive.ObjectID `bson:"partner"`
+	UserType    UserTypeModel      `bson:"type"`
 	Name        string
 	Image       string
 	Description string
